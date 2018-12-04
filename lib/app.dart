@@ -5,6 +5,8 @@
 
 import 'package:flutter/material.dart';
 
+// import 'package:flutter_lmwtfy/localization.dart';
+
 class LmwtfyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -34,15 +36,13 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ButtonBar(
-              children: <Widget>[
-                RaisedButton(
-                  child: Text('WELCOME'),
-                  onPressed: () {
-                    // TODO: Go to EventsListing.
-                  },
-                ),
-              ],
+            // Text(LmgtfyLocalization.of(context).test),
+            RaisedButton(
+              child: Text('WELCOME'),
+              onPressed: () {
+                // TODO: Go to EventsListing.
+                print('Welcome has been pressed.');
+              },
             ),
           ],
         ),
