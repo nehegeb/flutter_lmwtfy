@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_lmwtfy/events.dart';
 // import 'package:flutter_lmwtfy/localization.dart';
 
 class LmwtfyApp extends StatelessWidget {
@@ -15,7 +16,22 @@ class LmwtfyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: SplashScreen(),
+      //home: SplashScreen(),
+      home: EventsListing(storage: EventsStorage()),
+
+/*
+      //onGenerateTitle: (BuildContext context) => LmgtfyLocalization.of(context).title,
+      localizationsDelegates: [
+        const LmgtfyLocalizationDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', ''),
+        const Locale('de', ''),
+      ],
+*/
+
     );
   }
 }
