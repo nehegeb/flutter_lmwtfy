@@ -1,16 +1,21 @@
-/**
- * Let me WICHTEL that for you!
- * An application by nehegeb.
- */
+///
+/// Let me WICHTEL that for you!
+/// An application by nehegeb.
+///
+/// This file contains everything needed for the events listing.
+///
 
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'commons.dart';
+import 'participants.dart';
+import 'storage.dart';
 
 class EventsListing extends StatefulWidget {
   // Setting up the storage.
-  final EventsStorage storage;
+  final LmwtfyStorage storage;
   EventsListing({Key key, @required this.storage}) : super(key: key);
 
   @override
@@ -20,7 +25,9 @@ class EventsListing extends StatefulWidget {
 class _EventsListingState extends State<EventsListing> {
   String _testString;
 
-  // INITIALIZATION
+  ///
+  /// INITIALIZATION
+  ///
 
   @override
   void initState() {
@@ -32,7 +39,9 @@ class _EventsListingState extends State<EventsListing> {
     });
   }
 
-  // FUNCTIONS
+  ///
+  /// FUNCTIONS | Add new event.
+  ///
 
   Future<File> _addEvent() async {
     setState(() {
@@ -42,9 +51,36 @@ class _EventsListingState extends State<EventsListing> {
     return widget.storage.saveJson(_testString);
   }
 
-  void _deleteEvent() {}
+  ///
+  /// FUNCTIONS | Delete event.
+  ///
 
-  // LAYOUT
+  String _deletedEventBackup;
+
+  void _deleteEvent(int index) {
+    // Back up the event for _deleteEventUndo().
+    _deletedEventBackup = _testString[index];
+
+    // Afterwards delete the event.
+    _testString.replaceRange(index, index + 1, '');
+    //_testString.removeAt(index);
+  }
+
+  void _deleteEventUndo() {
+    // Undo the deletion of the last event.
+    // This is only possible for the last event, and only if it has been deleted during the current app session.
+    _testString = '$_testString$_deletedEventBackup';
+  }
+
+  void _openEvent() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) =>
+            ParticipantsListing(storage: LmwtfyStorage())));
+  }
+
+  ///
+  /// LAYOUT
+  ///
 
   @override
   Widget build(BuildContext context) {
@@ -71,118 +107,41 @@ class _EventsListingState extends State<EventsListing> {
         // ...nonetheless make sure, all entrys are being used.
         final index = i ~/ 2;
 
-        return _buildListingEntry(_testString[index]);
+        final event = _testString[index];
+
+        // For editing maybe: https://stackoverflow.com/questions/52478469/flutter-disable-dismiss-direction-on-dismissable-widget
+        // A dismissible removes an entry from the list by swiping.
+        return Dismissible(
+          key: Key(event),
+          // Swipe to the left to delete the entry.
+          direction: DismissDirection.endToStart,
+          onDismissed: (direction) {
+            // Delete the swiped event.
+            setState(() {
+              _deleteEvent(index);
+            });
+            // Afterwards display a snackbar for visual feedback.
+            Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text('$event deleted'),
+              action: SnackBarAction(
+                label: 'UNDO',
+                onPressed: _deleteEventUndo,
+              ),
+            ));
+          },
+          background: dismissibleBackgroundForDelete(),
+          child: _buildListingEntry(event),
+        );
       },
     );
   }
 
-  Widget _buildListingEntry(String value) {
+  Widget _buildListingEntry(String event) {
     return ListTile(
-      title: Text('$value'),
+      title: Text('$event'),
+      onTap: () {
+        _openEvent();
+      },
     );
   }
 }
-
-// ***************
-// *** STORAGE ***
-// ***************
-
-class EventsStorage {
-  // STORAGE | File path.
-
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/events.txt');
-  }
-
-  // STORAGE | Saving data.
-
-  Future<File> saveJson(String json) async {
-    final file = await _localFile;
-
-    // Write the JOSN to the file.
-    return file.writeAsString('$json');
-  }
-
-  // STORAGE | Loading data.
-
-  Future<String> loadJson() async {
-    try {
-      final file = await _localFile;
-
-      // Read the JSON from the file.
-      String json = await file.readAsString();
-
-      return json;
-    } catch (e) {
-      // An error occured.
-      return 'ERROR';
-    }
-  }
-}
-
-// ************
-// *** DATA ***
-// ************
-
-class EventsData {
-  // Events data.
-  final int eventId;
-  final String eventTitle;
-  final String eventDate;
-
-  // Participant data.
-  final int participantId;
-  final String participantName;
-
-  EventsData(this.eventId, this.eventTitle, this.eventDate, this.participantId,
-      this.participantName);
-
-  // Encode data from JSON.
-  EventsData.fromJson(Map<String, dynamic> json)
-      : eventId = json['id'],
-        eventTitle = json['title'],
-        eventDate = json['date'],
-        participantId = json['id'],
-        participantName = json['name'];
-
-  // Decode data back to JSON format.
-  Map<String, dynamic> toJson() => {
-        'events': [
-          {
-            'id': eventId,
-            'title': eventTitle,
-            'date': eventDate,
-            'participants': [
-              {
-                'id': participantId,
-                'name': participantName,
-              }
-            ]
-          }
-        ]
-      };
-}
-
-/* Final JSON structure with types and comments.
-    {
-      'events': [{
-        'id': int - ID of the event,
-        'title': String - Name of the event,
-        'date': String - Date of the event,
-        'isCalculated': bool - The event has been calculated,
-        'participants': [{
-          'id': int - ID of the participant,
-          'name': String - Name of the participant,
-          'phone': String - The participants phone number for SMS or messengers,
-          'willGift': int - The ID of the participant this one will gift something,
-          'wontGift': ['id': int - All the IDs of other participants this one won't gift anything]
-        }]
-      }]
-    }
-*/

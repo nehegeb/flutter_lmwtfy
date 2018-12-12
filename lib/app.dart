@@ -1,12 +1,13 @@
-/**
- * Let me WICHTEL that for you!
- * An application by nehegeb.
- */
+///
+/// Let me WICHTEL that for you!
+/// An application by nehegeb.
+///
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_lmwtfy/events.dart';
-// import 'package:flutter_lmwtfy/localization.dart';
+import 'events.dart';
+// import 'localization.dart';
+import 'storage.dart';
 
 class LmwtfyApp extends StatelessWidget {
   @override
@@ -17,7 +18,7 @@ class LmwtfyApp extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       //home: SplashScreen(),
-      home: EventsListing(storage: EventsStorage()),
+      home: EventsListing(storage: LmwtfyStorage()),
 
 /*
       //onGenerateTitle: (BuildContext context) => LmgtfyLocalization.of(context).title,
@@ -31,7 +32,6 @@ class LmwtfyApp extends StatelessWidget {
         const Locale('de', ''),
       ],
 */
-
     );
   }
 }

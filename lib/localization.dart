@@ -1,7 +1,9 @@
-/**
- * Let me WICHTEL that for you!
- * An application by nehegeb.
- */
+/// 
+/// Let me WICHTEL that for you!
+/// An application by nehegeb.
+/// 
+/// This file contains all localizations for the app.
+/// 
 
 // https://github.com/flutter/website/blob/master/src/_includes/code/internationalization/minimal/main.dart
 
