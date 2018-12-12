@@ -42,6 +42,8 @@ class _EventsListingState extends State<EventsListing> {
     return widget.storage.saveJson(_testString);
   }
 
+  void _deleteEvent() {}
+
   // LAYOUT
 
   @override
@@ -50,7 +52,7 @@ class _EventsListingState extends State<EventsListing> {
       appBar: AppBar(
         title: Text('WICHTEL events'),
       ),
-      body: _testing(),
+      body: _buildListing(),
       floatingActionButton: FloatingActionButton(
         onPressed: _addEvent,
         tooltip: 'Add new event',
@@ -59,24 +61,26 @@ class _EventsListingState extends State<EventsListing> {
     );
   }
 
-  Widget _testing() {
-    return Column(children: <Widget>[
-      Text('abcd'),
-      Text('$_testString'),
-    ]);
-  }
-
-/*
   Widget _buildListing() {
-    return new ListView.builder(itemBuilder: (context, i) {
-      if (i.isOdd) return new Divider(); 
-      
-      
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      itemCount: (_testString.length * 2) - 1,
+      itemBuilder: (context, i) {
+        // Add a devider after each entry...
+        if (i.isOdd) return Divider();
+        // ...nonetheless make sure, all entrys are being used.
+        final index = i ~/ 2;
 
-    });
+        return _buildListingEntry(_testString[index]);
+      },
+    );
   }
-*/
 
+  Widget _buildListingEntry(String value) {
+    return ListTile(
+      title: Text('$value'),
+    );
+  }
 }
 
 // ***************
@@ -84,7 +88,6 @@ class _EventsListingState extends State<EventsListing> {
 // ***************
 
 class EventsStorage {
-
   // STORAGE | File path.
 
   Future<String> get _localPath async {
@@ -107,7 +110,7 @@ class EventsStorage {
   }
 
   // STORAGE | Loading data.
-  
+
   Future<String> loadJson() async {
     try {
       final file = await _localFile;
@@ -121,5 +124,65 @@ class EventsStorage {
       return 'ERROR';
     }
   }
-
 }
+
+// ************
+// *** DATA ***
+// ************
+
+class EventsData {
+  // Events data.
+  final int eventId;
+  final String eventTitle;
+  final String eventDate;
+
+  // Participant data.
+  final int participantId;
+  final String participantName;
+
+  EventsData(this.eventId, this.eventTitle, this.eventDate, this.participantId,
+      this.participantName);
+
+  // Encode data from JSON.
+  EventsData.fromJson(Map<String, dynamic> json)
+      : eventId = json['id'],
+        eventTitle = json['title'],
+        eventDate = json['date'],
+        participantId = json['id'],
+        participantName = json['name'];
+
+  // Decode data back to JSON format.
+  Map<String, dynamic> toJson() => {
+        'events': [
+          {
+            'id': eventId,
+            'title': eventTitle,
+            'date': eventDate,
+            'participants': [
+              {
+                'id': participantId,
+                'name': participantName,
+              }
+            ]
+          }
+        ]
+      };
+}
+
+/* Final JSON structure with types and comments.
+    {
+      'events': [{
+        'id': int - ID of the event,
+        'title': String - Name of the event,
+        'date': String - Date of the event,
+        'isCalculated': bool - The event has been calculated,
+        'participants': [{
+          'id': int - ID of the participant,
+          'name': String - Name of the participant,
+          'phone': String - The participants phone number for SMS or messengers,
+          'willGift': int - The ID of the participant this one will gift something,
+          'wontGift': ['id': int - All the IDs of other participants this one won't gift anything]
+        }]
+      }]
+    }
+*/
