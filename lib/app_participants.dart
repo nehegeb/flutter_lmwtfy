@@ -7,8 +7,8 @@
 
 import 'package:flutter/material.dart';
 
-import 'commons.dart';
-import 'storage.dart';
+import 'package:flutter_lmwtfy/commons.dart';
+import 'package:flutter_lmwtfy/storage.dart';
 
 class ParticipantsListing extends StatefulWidget {
   // Setting up the storage.

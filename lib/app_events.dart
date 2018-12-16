@@ -9,9 +9,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'commons.dart';
-import 'participants.dart';
-import 'storage.dart';
+import 'package:flutter_lmwtfy/app_participants.dart';
+import 'package:flutter_lmwtfy/commons.dart';
+import 'package:flutter_lmwtfy/storage.dart';
 
 class EventsListing extends StatefulWidget {
   // Setting up the storage.
@@ -24,6 +24,7 @@ class EventsListing extends StatefulWidget {
 
 class _EventsListingState extends State<EventsListing> {
   String _testString;
+  Map _events;
 
   ///
   /// INITIALIZATION
@@ -43,9 +44,20 @@ class _EventsListingState extends State<EventsListing> {
   /// FUNCTIONS | Add new event.
   ///
 
-  Future<File> _addEvent() async {
+  void _addEvent() {
+    // Get data for a new event entry.
+    Map<String, dynamic> _newEvent = newEvent();
+
+    // Open a dialog for user entry.
+    showDialog(
+      context: context,
+      builder: (context) => _eventSettingsDialog(context, _newEvent),
+    );
+  }
+
+  Future<File> _saveEvent(Map<String, dynamic> event) async {
     setState(() {
-      _testString = 'New event';
+      _testString = event['title'];
     });
 
     return widget.storage.saveJson(_testString);
@@ -71,6 +83,10 @@ class _EventsListingState extends State<EventsListing> {
     // This is only possible for the last event, and only if it has been deleted during the current app session.
     _testString = '$_testString$_deletedEventBackup';
   }
+
+  ///
+  /// FUNCTIONS | Open event.
+  ///
 
   void _openEvent() {
     Navigator.of(context).push(MaterialPageRoute(
@@ -99,7 +115,7 @@ class _EventsListingState extends State<EventsListing> {
 
   Widget _buildListing() {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      //padding: const EdgeInsets.symmetric(horizontal: 16.0),
       itemCount: (_testString.length * 2) - 1,
       itemBuilder: (context, i) {
         // Add a devider after each entry...
@@ -144,4 +160,92 @@ class _EventsListingState extends State<EventsListing> {
       },
     );
   }
+
+  Widget _eventSettingsDialog(BuildContext context, Map event) {
+    final _titleController = TextEditingController();
+    final _dateController = TextEditingController();
+
+    _titleController.text = event['title'];
+    _dateController.text = event['date'];
+
+    /*
+    @override dispose() {
+      _titleController.dispose();
+      _dateController.dispose();
+      super.dispose();
+    }
+    */
+
+    const double _padding = 20.0;
+
+    return Stack(
+      alignment: Alignment.center,
+      children: <Widget>[
+        Card(
+          margin: EdgeInsets.symmetric(horizontal: _padding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Settings above.
+              Container(
+                padding: EdgeInsets.fromLTRB(_padding, _padding, _padding, 0.0),
+                child: Column(
+                  children: <Widget>[
+                    // Title of the Dialog.
+                    Text('Add new event'),
+                    // Event title.
+                    TextField(
+                      controller: _titleController,
+                      //autofocus: true,
+                      decoration: InputDecoration(
+                        labelText: 'Event title',
+                      ),
+                      onEditingComplete: () {
+                        // Save the new title for the event.
+                        event['title'] = _titleController.text;
+                      },
+                    ),
+                    // Event date.
+                    TextField(
+                      controller: _dateController,
+                      decoration: InputDecoration(
+                        labelText: 'Date of the event',
+                      ),
+                      onEditingComplete: () {
+                        // Save the new date for the event.
+                        event['data'] = _dateController.text;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Buttons below.
+              ButtonTheme.bar(
+                child: ButtonBar(
+                  alignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    // Cancel button.
+                    FlatButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('CANCEL'),
+                    ),
+                    // Accept button.
+                    RaisedButton(
+                      onPressed: () {
+                        _saveEvent(event);
+                        Navigator.pop(context);
+                      },
+                      child: Text('ADD'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
 }

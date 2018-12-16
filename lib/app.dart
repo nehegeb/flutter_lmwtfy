@@ -2,12 +2,14 @@
 /// Let me WICHTEL that for you!
 /// An application by nehegeb.
 ///
+/// This file starts the app with an initial spash screen.
+///
 
 import 'package:flutter/material.dart';
 
-import 'events.dart';
-// import 'localization.dart';
-import 'storage.dart';
+import 'package:flutter_lmwtfy/app_events.dart';
+// import 'package:flutter_lmwtfy/localization.dart';
+import 'package:flutter_lmwtfy/storage.dart';
 
 class LmwtfyApp extends StatelessWidget {
   @override
@@ -17,8 +19,8 @@ class LmwtfyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      //home: SplashScreen(),
-      home: EventsListing(storage: LmwtfyStorage()),
+      home: SplashScreen(),
+      //home: EventsListing(storage: LmwtfyStorage()),
 
 /*
       //onGenerateTitle: (BuildContext context) => LmgtfyLocalization.of(context).title,
@@ -42,22 +44,33 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  
+  ///
+  /// FUNCTIONS
+  ///
+
+  void _startLmwtfy() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) =>
+            EventsListing(storage: LmwtfyStorage())));
+  }
+
+  ///
+  /// LAYOUT
+  ///
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Let me WICHTEL that for you!'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             // Text(LmgtfyLocalization.of(context).test),
             RaisedButton(
-              child: Text('WELCOME'),
+              child: Text('Let me WICHTEL that for you!'),
               onPressed: () {
-                // TODO: Go to EventsListing.
-                print('Welcome has been pressed.');
+                _startLmwtfy();
               },
             ),
           ],
@@ -65,4 +78,5 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
+
 }

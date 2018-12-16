@@ -9,7 +9,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class LmwtfyStorage {
-  
   ///
   /// STORAGE | File path.
   ///
@@ -54,62 +53,118 @@ class LmwtfyStorage {
   }
 }
 
-// ************
-// *** DATA ***
-// ************
+// ***********************
+// *** DATA MANAGEMENT ***
+// ***********************
 
-class EventsData {
-  // Events data.
-  final int eventId;
-  final String eventTitle;
-  final String eventDate;
+class LmwtfyData {
+  // All LMWTFY data.
+  final List events;
 
-  // Participant data.
-  final int participantId;
-  final String participantName;
-
-  EventsData(this.eventId, this.eventTitle, this.eventDate, this.participantId,
-      this.participantName);
+  LmwtfyData(this.events);
 
   // Encode data from JSON.
-  EventsData.fromJson(Map<String, dynamic> json)
-      : eventId = json['id'],
-        eventTitle = json['title'],
-        eventDate = json['date'],
-        participantId = json['id'],
-        participantName = json['name'];
+  LmwtfyData.fromJson(Map<String, dynamic> json) : events = json['events'];
 
   // Decode data back to JSON format.
   Map<String, dynamic> toJson() => {
-        'events': [
-          {
-            'id': eventId,
-            'title': eventTitle,
-            'date': eventDate,
-            'participants': [
-              {
-                'id': participantId,
-                'name': participantName,
-              }
-            ]
-          }
-        ]
+        'events': events,
+      };
+}
+
+// Create a new event from <String, dynamic> scratch.
+Map<String, dynamic> newEvent() => {
+  'eventId': 0,
+  'title': 'New event',
+  'date': 'today',
+  'participants': []
+};
+
+/*
+class EventData {
+  // Main data of one event.
+  final int id;
+  final String eventTitle;
+  final String eventDate;
+  final List participants;
+
+  EventData(this.id, this.eventTitle, this.eventDate, this.participants);
+
+  // Encode data from JSON.
+  EventData.fromJson(Map<String, dynamic> json)
+      : id = json['eventId'],
+        eventTitle = json['title'],
+        eventDate = json['date'],
+        participants = json['participants'];
+
+  // Decode data back to JSON format.
+  Map<String, dynamic> toJson() => {
+        'eventId': id,
+        'title': eventTitle,
+        'date': eventDate,
+        'participants': []
+      };
+
+}
+*/
+
+class ParticipantData {
+  // Main data of one participant.
+  final int id;
+  final String name;
+  final String phone;
+  final int willGift;
+  final List wontGift;
+
+  ParticipantData(this.id, this.name, this.phone, this.willGift, this.wontGift);
+
+  // Encode data from JSON.
+  ParticipantData.fromJson(Map<String, dynamic> json)
+      : id = json['participantsId'],
+        name = json['name'],
+        phone = json['phone'],
+        willGift = json['willGift'],
+        wontGift = json['wontGift'];
+
+  // Decode data back to JSON format.
+  Map<String, dynamic> toJson() => {
+        'participantsId': id,
+        'name': name,
+        'phone': phone,
+        'willGift': willGift,
+        'wontGift': []
+      };
+}
+
+class ParticipantWontGiftData {
+  // A list of participants, this one will not gift anything.
+  final List participantIds;
+
+  ParticipantWontGiftData(this.participantIds);
+
+  // Encode data from JSON.
+  ParticipantWontGiftData.fromJson(Map<String, dynamic> json)
+      : participantIds = json['wontGift'];
+
+  // Decode data back to JSON format.
+  Map<String, dynamic> toJson() => {
+        'wontGift': participantIds,
       };
 }
 
 /* Final JSON structure with types and comments.
     {
       'events': [{
-        'id': int - ID of the event,
+        'eventId': int - ID of the event,
         'title': String - Name of the event,
         'date': String - Date of the event,
         'isCalculated': bool - The event has been calculated,
         'participants': [{
-          'id': int - ID of the participant,
+          'participantId': int - ID of the participant,
           'name': String - Name of the participant,
           'phone': String - The participants phone number for SMS or messengers,
           'willGift': int - The ID of the participant this one will gift something,
-          'wontGift': ['id': int - All the IDs of other participants this one won't gift anything]
+          'wontGift': ['participantId': int - All the IDs of other participants this one won't gift anything]
         }]
       }]
     }
