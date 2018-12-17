@@ -46,7 +46,7 @@ class _EventsListingState extends State<EventsListing> {
 
   void _addEvent() {
     // Get data for a new event entry.
-    Map<String, dynamic> _newEvent = newEvent();
+    Map<String, dynamic> _newEvent = EventData.newEvent();
 
     // Open a dialog for user entry.
     showDialog(
@@ -56,10 +56,14 @@ class _EventsListingState extends State<EventsListing> {
   }
 
   Future<File> _saveEvent(Map<String, dynamic> event) async {
+    
+
+
     setState(() {
       _testString = event['title'];
     });
 
+    // Save the LMWTFY data to the file.
     return widget.storage.saveJson(_testString);
   }
 

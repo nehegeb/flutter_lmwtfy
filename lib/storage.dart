@@ -72,13 +72,18 @@ class LmwtfyData {
       };
 }
 
-// Create a new event from <String, dynamic> scratch.
-Map<String, dynamic> newEvent() => {
-  'eventId': 0,
-  'title': 'New event',
-  'date': 'today',
-  'participants': []
-};
+class EventData {
+
+  // Create a new event from scratch.
+  static Map<String, dynamic> newEvent() => {
+    'eventId': 0,
+    'title': 'New event',
+    'date': 'today',
+    'isCalculated': false,
+    'participants': []
+  };
+
+}
 
 /*
 class EventData {
