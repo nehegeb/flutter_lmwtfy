@@ -5,7 +5,9 @@
 /// This file contains all data-storing stuff.
 ///
 
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 
 class LmwtfyStorage {
@@ -27,6 +29,11 @@ class LmwtfyStorage {
   /// STORAGE | Saving data.
   ///
 
+  saveDatabase(Map<String, dynamic> database) async {
+    String _jsonDb = json.encode(database);
+    saveJson(_jsonDb);
+  }
+
   Future<File> saveJson(String json) async {
     final file = await _localFile;
 
@@ -37,6 +44,12 @@ class LmwtfyStorage {
   ///
   /// STORAGE | Loading data.
   ///
+
+  Future<Map> loadDatabase() async {
+    String _jsonDb = await loadJson();
+    Map<String, dynamic> database = await json.decode(_jsonDb);
+    return database;
+  }
 
   Future<String> loadJson() async {
     try {
@@ -58,15 +71,17 @@ class LmwtfyStorage {
 // ***********************
 
 class LmwtfyData {
-  // All LMWTFY data.
   final List events;
 
   LmwtfyData(this.events);
 
-  // Encode data from JSON.
+  // Decode data from JSON.
+  // >>> Map dataMap = json.decode(json);
+  // >>> var lmwtfyDb = LmwtfyData.fromJson(dataMap);
   LmwtfyData.fromJson(Map<String, dynamic> json) : events = json['events'];
 
-  // Decode data back to JSON format.
+  // Encode data back to JSON format.
+  // >>> String json = json.encode(lmwtfyDb);
   Map<String, dynamic> toJson() =>
     {
       'events': events,

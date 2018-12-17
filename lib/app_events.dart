@@ -23,8 +23,7 @@ class EventsListing extends StatefulWidget {
 }
 
 class _EventsListingState extends State<EventsListing> {
-  String _testString;
-  Map<String,dynamic> _lmwtfyDb;
+  Map<String, dynamic> _lmwtfyDb;
 
   ///
   /// INITIALIZATION
@@ -33,12 +32,16 @@ class _EventsListingState extends State<EventsListing> {
   @override
   void initState() {
     super.initState();
-
-    _lmwtfyDb = LmwtfyData.newLmwtfy();
-
-    widget.storage.loadJson().then((String value) {
+    // Load the LMWTFY database to display.
+    widget.storage.loadDatabase().then((Map database) {
       setState(() {
-        _testString = value;
+        if (database == null) {
+          // New database will be initiated.
+          _lmwtfyDb = LmwtfyData.newLmwtfy();
+        } else {
+          // Saved database will be used.
+          _lmwtfyDb = database;
+        }
       });
     });
   }
@@ -59,7 +62,6 @@ class _EventsListingState extends State<EventsListing> {
   }
 
   Future<File> _saveEvent(Map<String, dynamic> event) async {
-
     // Make sure, LMWTFY database already exists.
     if (_lmwtfyDb == null) {
       _lmwtfyDb = LmwtfyData.newLmwtfy();
@@ -67,15 +69,13 @@ class _EventsListingState extends State<EventsListing> {
 
     // Update the display with the new event.
     setState(() {
-      _testString = event['title'];
       // Add the new event to LMWTFY database.
       event['eventId'] = _nextEventId();
       _lmwtfyDb['events'].add(event);
     });
 
     // Save the LMWTFY database to the storage file.
-    //return widget.storage.saveJson(LmwtfyData.toJson(_lmwtfyData));
-    return widget.storage.saveJson(_testString);
+    return widget.storage.saveDatabase(_lmwtfyDb);
   }
 
   int _nextEventId() {
@@ -83,7 +83,8 @@ class _EventsListingState extends State<EventsListing> {
 
     // Check all used event IDs and return the highest one +1.
     for (var event in _lmwtfyDb['events']) {
-      _highestId = _highestId > event['eventId'] ? _highestId : event['eventId'];
+      _highestId =
+          _highestId > event['eventId'] ? _highestId : event['eventId'];
     }
     return ++_highestId;
   }
@@ -92,7 +93,7 @@ class _EventsListingState extends State<EventsListing> {
   /// FUNCTIONS | Delete event.
   ///
 
-  Map<String,dynamic> _deletedEventBackup;
+  Map<String, dynamic> _deletedEventBackup;
 
   void _deleteEvent(int index) {
     // Back up the event for _deleteEventUndo().
@@ -105,8 +106,8 @@ class _EventsListingState extends State<EventsListing> {
   void _deleteEventUndo() {
     // Undo the deletion of the last event.
     // This is only possible for the last event, and only if it has been deleted during the current app session.
-      _deletedEventBackup['eventId'] = _nextEventId();
-      _lmwtfyDb['events'].add(_deletedEventBackup);
+    _deletedEventBackup['eventId'] = _nextEventId();
+    _lmwtfyDb['events'].add(_deletedEventBackup);
   }
 
   ///
@@ -279,5 +280,4 @@ class _EventsListingState extends State<EventsListing> {
       ],
     );
   }
-
 }

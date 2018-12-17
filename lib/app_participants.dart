@@ -5,6 +5,8 @@
 /// This file contains everything needed for the participants listing.
 ///
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_lmwtfy/commons.dart';

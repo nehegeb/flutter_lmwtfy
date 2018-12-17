@@ -3,6 +3,7 @@
 /// An application by nehegeb.
 ///
 /// This file starts the app with an initial spash screen.
+/// One can only advance when all data has been loaded.
 ///
 
 import 'package:flutter/material.dart';
@@ -44,7 +45,16 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  
+  Map<String, dynamic> lmwtfyDb;
+
+  ///
+  /// INITIALIZATION
+  ///
+
+  // TODO: Get $lmwtfyDb to load here with a 'Future'.
+  // TODO: Display the etnry-button after the 'await'.
+  // TODO: Carry over this $lmwtfyDb to the other app routes.
+
   ///
   /// FUNCTIONS
   ///
@@ -66,6 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+
             // Text(LmgtfyLocalization.of(context).test),
             RaisedButton(
               child: Text('Let me WICHTEL that for you!'),
@@ -73,6 +84,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 _startLmwtfy();
               },
             ),
+
           ],
         ),
       ),
