@@ -36,10 +36,10 @@ class _EventsListingState extends State<EventsListing> {
     widget.storage.loadDatabase().then((Map database) {
       setState(() {
         if (database == null) {
-          // New database will be initiated.
+          // Initiate a new and empty database.
           _lmwtfyDb = LmwtfyData.newLmwtfy();
         } else {
-          // Saved database will be used.
+          // Use the loaded database.
           _lmwtfyDb = database;
         }
       });
@@ -61,7 +61,7 @@ class _EventsListingState extends State<EventsListing> {
     );
   }
 
-  Future<File> _saveEvent(Map<String, dynamic> event) async {
+  Future<String> _saveEvent(Map<String, dynamic> event) async {
     // Make sure, LMWTFY database already exists.
     if (_lmwtfyDb == null) {
       _lmwtfyDb = LmwtfyData.newLmwtfy();
@@ -118,6 +118,20 @@ class _EventsListingState extends State<EventsListing> {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext context) =>
             ParticipantsListing(storage: LmwtfyStorage())));
+  }
+
+  ///
+  /// FUNCTIONS | Reset the whole LMWTFY database.
+  ///
+
+  void _resetLmwtfyDatabase() {
+    // TODO: User dialog.
+    // Initiate a new and empty database.
+    Map<String, dynamic> database = LmwtfyData.newLmwtfy();
+    // Save the new database to the storage file.
+    widget.storage.saveDatabase(database);
+    // Let the new database free.
+    _lmwtfyDb = database;
   }
 
   ///

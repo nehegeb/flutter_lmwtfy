@@ -29,14 +29,22 @@ class LmwtfyStorage {
   /// STORAGE | Saving data.
   ///
 
-  saveDatabase(Map<String, dynamic> database) async {
-    String _jsonDb = json.encode(database);
-    saveJson(_jsonDb);
+  Future<String> saveDatabase(Map<String, dynamic> database) async {
+    try {
+      // Encode and save database as JSON.
+      String _jsonDb = json.encode(database);
+      await saveJson(_jsonDb);
+      // Return a success message.
+      return 'Data has been saved.';
+    } catch (e) {
+      // An error occured.
+      return 'ERROR';
+    }
   }
 
   Future<File> saveJson(String json) async {
+    // Get local file path.
     final file = await _localFile;
-
     // Write the JOSN to the file.
     return file.writeAsString('$json');
   }
@@ -46,18 +54,20 @@ class LmwtfyStorage {
   ///
 
   Future<Map> loadDatabase() async {
+    // Decode and load database from JSON.
     String _jsonDb = await loadJson();
     Map<String, dynamic> database = await json.decode(_jsonDb);
+    // Return the database.
     return database;
   }
 
   Future<String> loadJson() async {
     try {
+      // Get local file path.
       final file = await _localFile;
-
       // Read the JSON from the file.
       String json = await file.readAsString();
-
+      // Return the JSON as string.
       return json;
     } catch (e) {
       // An error occured.
@@ -76,12 +86,9 @@ class LmwtfyData {
   LmwtfyData(this.events);
 
   // Decode data from JSON.
-  // >>> Map dataMap = json.decode(json);
-  // >>> var lmwtfyDb = LmwtfyData.fromJson(dataMap);
   LmwtfyData.fromJson(Map<String, dynamic> json) : events = json['events'];
 
   // Encode data back to JSON format.
-  // >>> String json = json.encode(lmwtfyDb);
   Map<String, dynamic> toJson() =>
     {
       'events': events,
