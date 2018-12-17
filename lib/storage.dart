@@ -67,21 +67,30 @@ class LmwtfyData {
   LmwtfyData.fromJson(Map<String, dynamic> json) : events = json['events'];
 
   // Decode data back to JSON format.
-  Map<String, dynamic> toJson() => {
-        'events': events,
-      };
+  Map<String, dynamic> toJson() =>
+    {
+      'events': events,
+    };
+
+  // Create the basics from scratch.
+  static Map<String, dynamic> newLmwtfy() =>
+    {
+      'events': []
+    };
+
 }
 
 class EventData {
 
   // Create a new event from scratch.
-  static Map<String, dynamic> newEvent() => {
-    'eventId': 0,
-    'title': 'New event',
-    'date': 'today',
-    'isCalculated': false,
-    'participants': []
-  };
+  static Map<String, dynamic> newEvent() =>
+    {
+      'eventId': 0,
+      'title': 'New event',
+      'date': 'today',
+      'isCalculated': false,
+      'participants': []
+    };
 
 }
 

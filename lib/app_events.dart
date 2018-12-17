@@ -24,7 +24,7 @@ class EventsListing extends StatefulWidget {
 
 class _EventsListingState extends State<EventsListing> {
   String _testString;
-  Map _events;
+  Map<String,dynamic> _lmwtfyDb;
 
   ///
   /// INITIALIZATION
@@ -33,6 +33,9 @@ class _EventsListingState extends State<EventsListing> {
   @override
   void initState() {
     super.initState();
+
+    _lmwtfyDb = LmwtfyData.newLmwtfy();
+
     widget.storage.loadJson().then((String value) {
       setState(() {
         _testString = value;
@@ -56,36 +59,54 @@ class _EventsListingState extends State<EventsListing> {
   }
 
   Future<File> _saveEvent(Map<String, dynamic> event) async {
-    
 
+    // Make sure, LMWTFY database already exists.
+    if (_lmwtfyDb == null) {
+      _lmwtfyDb = LmwtfyData.newLmwtfy();
+    }
 
+    // Update the display with the new event.
     setState(() {
       _testString = event['title'];
+      // Add the new event to LMWTFY database.
+      event['eventId'] = _nextEventId();
+      _lmwtfyDb['events'].add(event);
     });
 
-    // Save the LMWTFY data to the file.
+    // Save the LMWTFY database to the storage file.
+    //return widget.storage.saveJson(LmwtfyData.toJson(_lmwtfyData));
     return widget.storage.saveJson(_testString);
+  }
+
+  int _nextEventId() {
+    int _highestId = -1;
+
+    // Check all used event IDs and return the highest one +1.
+    for (var event in _lmwtfyDb['events']) {
+      _highestId = _highestId > event['eventId'] ? _highestId : event['eventId'];
+    }
+    return ++_highestId;
   }
 
   ///
   /// FUNCTIONS | Delete event.
   ///
 
-  String _deletedEventBackup;
+  Map<String,dynamic> _deletedEventBackup;
 
   void _deleteEvent(int index) {
     // Back up the event for _deleteEventUndo().
-    _deletedEventBackup = _testString[index];
+    _deletedEventBackup = _lmwtfyDb['events'][index];
 
     // Afterwards delete the event.
-    _testString.replaceRange(index, index + 1, '');
-    //_testString.removeAt(index);
+    _lmwtfyDb['events'].removeAt(index);
   }
 
   void _deleteEventUndo() {
     // Undo the deletion of the last event.
     // This is only possible for the last event, and only if it has been deleted during the current app session.
-    _testString = '$_testString$_deletedEventBackup';
+      _deletedEventBackup['eventId'] = _nextEventId();
+      _lmwtfyDb['events'].add(_deletedEventBackup);
   }
 
   ///
@@ -106,7 +127,7 @@ class _EventsListingState extends State<EventsListing> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('WICHTEL events'),
+        title: Text('${_lmwtfyDb['events'].length} WICHTEL events'),
       ),
       body: _buildListing(),
       floatingActionButton: FloatingActionButton(
@@ -120,32 +141,39 @@ class _EventsListingState extends State<EventsListing> {
   Widget _buildListing() {
     return ListView.builder(
       //padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      itemCount: (_testString.length * 2) - 1,
+      itemCount: (_lmwtfyDb['events'].length * 2) - 1,
       itemBuilder: (context, i) {
         // Add a devider after each entry...
         if (i.isOdd) return Divider();
         // ...nonetheless make sure, all entrys are being used.
         final index = i ~/ 2;
 
-        final event = _testString[index];
+        final Map<String, dynamic> event = _lmwtfyDb['events'][index];
 
         // For editing maybe: https://stackoverflow.com/questions/52478469/flutter-disable-dismiss-direction-on-dismissable-widget
         // A dismissible removes an entry from the list by swiping.
         return Dismissible(
-          key: Key(event),
+          key: Key(event['eventId'].toString()),
           // Swipe to the left to delete the entry.
           direction: DismissDirection.endToStart,
           onDismissed: (direction) {
             // Delete the swiped event.
             setState(() {
+              // Remove the event from the lsting.
+              event.remove(event['eventId'].toString());
+              // Remove the event from the LMWTFY database.
               _deleteEvent(index);
             });
             // Afterwards display a snackbar for visual feedback.
             Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('$event deleted'),
+              content: Text('${event['title']} deleted'),
               action: SnackBarAction(
                 label: 'UNDO',
-                onPressed: _deleteEventUndo,
+                onPressed: () {
+                  setState(() {
+                    _deleteEventUndo();
+                  });
+                },
               ),
             ));
           },
@@ -156,9 +184,9 @@ class _EventsListingState extends State<EventsListing> {
     );
   }
 
-  Widget _buildListingEntry(String event) {
+  Widget _buildListingEntry(Map<String, dynamic> event) {
     return ListTile(
-      title: Text('$event'),
+      title: Text('${event['title']} (${event['eventId']})'),
       onTap: () {
         _openEvent();
       },
