@@ -43,7 +43,7 @@ class LmgtfyLocalizationDelegate extends LocalizationsDelegate<LmgtfyLocalizatio
   bool isSupported(Locale locale) => ['en', 'de'].contains(locale.languageCode);
 
   @override
-  Future<LmgtfyLocalization> load(Locale locale) 
+  Future<LmgtfyLocalization> load(Locale locale) {
     return SynchronousFuture<LmgtfyLocalization>(LmgtfyLocalization(locale));
   }
 

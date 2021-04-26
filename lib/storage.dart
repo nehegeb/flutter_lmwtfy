@@ -54,11 +54,16 @@ class LmwtfyStorage {
   ///
 
   Future<Map> loadDatabase() async {
-    // Decode and load database from JSON.
-    String _jsonDb = await loadJson();
-    Map<String, dynamic> database = await json.decode(_jsonDb);
-    // Return the database.
-    return database;
+    try {
+      // Decode and load database from JSON.
+      String _jsonDb = await loadJson();
+      Map<String, dynamic> database = await json.decode(_jsonDb);
+      // Return the database.
+      return database;
+    } catch (e) {
+      // An error occured.
+      return { 'ERROR': 'error' };
+    }
   }
 
   Future<String> loadJson() async {
